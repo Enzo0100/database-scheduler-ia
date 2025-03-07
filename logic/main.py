@@ -23,7 +23,7 @@ address = os.getenv("URL")
 if not os.path.exists(PASTA_DOWNLOADS):
     os.makedirs(PASTA_DOWNLOADS)
 
-baixar_faltantes = input("Deseja baixar arquivos da S3? (y/N)")
+# baixar_faltantes = input("Deseja baixar arquivos da S3? (y/N)")
 
 def sincronizar_datasets(address):
     """
@@ -84,25 +84,30 @@ def sincronizar_datasets(address):
                     if tenant_id not in documentos_faltando:
                         documentos_faltando[tenant_id] = {}
                     documentos_faltando[tenant_id][categoria] = arquivos_faltantes
-                    if baixar_faltantes == "y":
-                        #Adicionar função de adicionar no banco de dados
-                        baixar_documentos_faltantes_s3(arquivos_faltantes_com_extensao, tenant_id, categoria)
-                        for file_name in arquivos_faltantes_com_extensao:
-                            name = file_name
-                            name = name.replace(".mp3", "").replace(".mp4", "")
-                            print(f"FILE NAMEEEEE = {file_name}")
-                            md_file_path = process_video_to_markdown(
-                                video_path=f"downloads/{categoria}/{file_name}",
-                                output_dir=f"downloads/{categoria}",
-                                file= name
-                            )
+                    # if baixar_faltantes == "y":
+                    #Adicionar função de adicionar no banco de dados
+                    baixar_documentos_faltantes_s3(arquivos_faltantes_com_extensao, tenant_id, categoria)
+                    for file_name in arquivos_faltantes_com_extensao:
+                        name = file_name
+                        name = name.replace(".mp3", "").replace(".mp4", "")
+                        print(f"FILE NAMEEEEE = {file_name}")
+                        md_file_path = process_video_to_markdown(
+                            video_path=f"downloads/{categoria}/{file_name}",
+                            output_dir=f"downloads/{categoria}",
+                            file= name
+                        )
 
-                        # Passo 3: Remover todos os .mp3 e .mp4 da pasta após o processamento
-                        for item in os.listdir(categoria_path):
-                            if item.lower().endswith(".mp4") or item.lower().endswith(".mp3"):
-                                os.remove(os.path.join(categoria_path, item))
-                                print(f"Removido: {item}")
-
+                    # Passo 3: Remover todos os .mp3 e .mp4 da pasta após o processamento
+                                        # Criar a pasta de downloads se não existir
+                    if not os.path.exists(categoria_path):
+                        os.makedirs(categoria_path)
+                    for item in os.listdir(categoria_path):
+                        if item.lower().endswith(".mp4") or item.lower().endswith(".mp3"):
+                            os.remove(os.path.join(categoria_path, item))
+                            print(f"Removido: {item}")
+                            
+                if not os.path.exists(categoria_path):
+                    os.makedirs(categoria_path)
                 # Passo 4: Listar os arquivos que sobraram (por ex., .md)
                 arquivos_restantes = os.listdir(categoria_path)
                 print(f"Arquivos restantes na pasta {categoria}: {arquivos_restantes}")
@@ -138,21 +143,23 @@ def sincronizar_datasets(address):
                         documentos_faltando[tenant_id] = {}
                     documentos_faltando[tenant_id][categoria] = arquivos_categoria_s3  
 
-                    if baixar_faltantes == "y":
-                        baixar_documentos_faltantes_s3(arquivos_categoria_s3, tenant_id, categoria)
+                    # if baixar_faltantes == "y":
+                    baixar_documentos_faltantes_s3(arquivos_categoria_s3, tenant_id, categoria)
 
-                        for file_name in arquivos_categoria_s3:
-                            name = file_name.replace(".mp3", "").replace(".mp4", "")
-                            md_file_path = process_video_to_markdown(
-                                video_path=f"downloads/{categoria}/{file_name}",
-                                output_dir=f"downloads/{categoria}",
-                                file=name
-                            )
+                    for file_name in arquivos_categoria_s3:
+                        name = file_name.replace(".mp3", "").replace(".mp4", "")
+                        md_file_path = process_video_to_markdown(
+                            video_path=f"downloads/{categoria}/{file_name}",
+                            output_dir=f"downloads/{categoria}",
+                            file=name
+                        )
+                    if not os.path.exists(categoria_path):
+                        os.makedirs(categoria_path)
 
-                        for item in os.listdir(categoria_path):
-                            if item.lower().endswith(".mp4") or item.lower().endswith(".mp3"):
-                                os.remove(os.path.join(categoria_path, item))
-                                print(f"Removido: {item}")
+                    for item in os.listdir(categoria_path):
+                        if item.lower().endswith(".mp4") or item.lower().endswith(".mp3"):
+                            os.remove(os.path.join(categoria_path, item))
+                            print(f"Removido: {item}")
 
                     arquivos_restantes = os.listdir(categoria_path)
                     print(f"Arquivos restantes na pasta {categoria}: {arquivos_restantes}")

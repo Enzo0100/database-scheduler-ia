@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  app:
+    image: minha-app:latest
+    build: .
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+    volumes:
+      - ./app:/app
+    networks:
+      - minha-rede
+    command: ["python3", "logic/main.py"]
+
+  scheduler:
+    image: cron-job
+    build: ./cron
+    deploy:
+      replicas: 1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - minha-rede
+
+networks:
+  minha-rede:
+    driver: overlay
