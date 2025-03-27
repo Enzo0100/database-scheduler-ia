@@ -34,7 +34,7 @@ def sincronizar_datasets(address):
     """
 
     Api_tenant = {
-        "1": "ragflow-U1MWFlNmM0ZmFiMjExZWZhNWNiMDI0Mm",
+        "1": "ragflow-JjZDcwOTdhMGE2MzExZjBiNTAzMDI0Mm",
     }
     print("\n🔄 Iniciando sincronização de datasets...\n")
 

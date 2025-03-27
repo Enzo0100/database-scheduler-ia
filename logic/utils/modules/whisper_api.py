@@ -1,27 +1,28 @@
+import whisper
 import os
-import requests
-from dotenv import load_dotenv
 
-# Carregar variáveis do arquivo .env
-load_dotenv()
+def send_to_whisper(caminho_audio, modelo='tiny', idioma='pt'):
+    """
+    Função super simplificada para transcrição com Whisper
+    - Deixa o próprio Whisper gerenciar o download e cache dos modelos
+    - Trata apenas os erros essenciais
+    """
+    try:
+        # Verifica se o arquivo existe
+        if not os.path.exists(caminho_audio):
+            print("Arquivo de áudio não encontrado!")
+            return None
 
-# Pega a chave da API do arquivo .env
-openai_api_key = os.getenv("OPENAI_API_KEY")
-
-def send_to_whisper(audio_file):
-    url = "https://api.openai.com/v1/audio/transcriptions"
-    headers = {
-        'Authorization': f'Bearer {openai_api_key}',  # Usando a chave da API do .env
-    }
-    
-    with open(audio_file, 'rb') as f:
-        files = {
-            'file': (audio_file, f),
-            'model': (None, 'whisper-1'),
-        }
-        response = requests.post(url, headers=headers, files=files)
+        # Carrega o modelo (deixa o Whisper cuidar do download)
+        print("Carregando modelo Whisper...")
+        model = whisper.load_model(modelo)
         
-    if response.status_code == 200:
-        return response.json().get("text")
-    else:
-        raise Exception(f"Erro ao transcrever {audio_file}: {response.status_code}, {response.text}")
+        # Faz a transcrição
+        print("Transcrevendo áudio...")
+        resultado = model.transcribe(caminho_audio, language=idioma)
+        
+        return resultado['text']
+    
+    except Exception as e:
+        print(f"Erro na transcrição: {str(e)}")
+        return None
